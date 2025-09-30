@@ -39,23 +39,30 @@ gh auth login
 git clone https://github.com/focus/gh-coderabbit-comments.git
 cd gh-coderabbit-comments
 
-# Make the script executable
-chmod +x bin/gh-crab-comments
-
-# Copy to your PATH (optional)
+# Copy to your PATH (required - so you can run from any repo)
 mkdir -p ~/bin
 cp bin/gh-crab-comments ~/bin/
+chmod +x ~/bin/gh-crab-comments
+
+# Add ~/bin to PATH if not already there
 echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
+
+# Verify installation
+which gh-crab-comments
 ```
 
 ## Usage
 
 ### Basic Usage
 
-Navigate to any git repository with an open PR and run:
+From any git repository with an open PR:
 
 ```bash
+# Navigate to your project repo (NOT the gh-coderabbit-comments repo)
+cd /path/to/your/project-with-pr
+
+# Run the command
 gh-crab-comments
 ```
 
