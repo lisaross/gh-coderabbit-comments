@@ -94,6 +94,15 @@ A developer working on a pull request receives CodeRabbit review comments and wa
 - **FR-013**: System MUST save all fetched comments to a file for later review
 - **FR-014**: System MUST exit with code 0 on success, 1 on user error, 2 on system error
 
+### Non-Functional Requirements
+
+- **NFR-001**: System MUST complete execution in <5 seconds for PRs with <50 comments (performance goal)
+- **NFR-002**: System MUST complete execution in <30 seconds for PRs with 500+ comments (performance goal)
+- **NFR-003**: System MUST support PRs with up to 1000+ comments via pagination (scalability)
+- **NFR-004**: System MUST use token-efficient output format suitable for AI assistant consumption (Claude Code integration)
+- **NFR-005**: System MUST follow macOS terminal conventions (colors, emojis, PATH installation)
+- **NFR-006**: System MUST be implementable as a single bash script <500 lines (maintainability)
+
 ### Key Entities
 
 - **Pull Request**: The GitHub pull request being reviewed, identified by owner, repo name, and PR number

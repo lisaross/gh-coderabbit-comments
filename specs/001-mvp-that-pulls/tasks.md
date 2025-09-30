@@ -23,7 +23,7 @@
    → Setup tasks marked [P] (different files)
    → Test tasks marked [P] (independent scenarios)
    → Core tasks sequential (same script file)
-5. Number tasks sequentially (T001-T025)
+5. Number tasks sequentially (T001-T032)
 6. Generate dependency graph ✅
 7. Create parallel execution examples ✅
 8. Validate task completeness:
@@ -200,13 +200,16 @@
 ### Repository Context Detection
 
 - [ ] **T017** Implement repository context detection in `bin/gh-crab-comments`
+  - **Validates**: Repository Context entity (spec.md:L102, data-model.md)
   - Check if in git repo: `git rev-parse --is-inside-work-tree`
   - Exit code 1 with error message if not in repo (FR-010)
   - Extract owner: `gh repo view --json owner -q .owner.login`
   - Extract repo name: `gh repo view --json name -q .name`
-  - Validate owner/repo against regex from data-model.md
+  - Extract current branch: `git branch --show-current`
+  - Validate owner/repo against regex from data-model.md (owner: `^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$`, repo: `^[a-zA-Z0-9._-]+$`)
   - Exit code 1 if validation fails
   - Run tests: T008 should pass (not in repo error)
+  - **Covers**: FR-001 (auto-detect owner/name) + Repository Context entity
 
 ### PR Number Detection
 

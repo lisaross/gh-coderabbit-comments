@@ -150,7 +150,7 @@ gh-coderabbit-comments/
 ├── .coderabbit/                  # Output directory (gitignored)
 │   └── pr-<number>-comments.txt  # Saved comments per PR
 ├── README.md                     # Installation & usage docs
-└── manual-testing.md             # Manual test checklist
+└── manual-testing.md             # Symlink or reference to quickstart.md
 ```
 
 **Structure Decision**: Single project structure selected. This is a standalone bash CLI tool with no frontend/backend split. The main script lives in `bin/` for easy PATH installation. Tests use `bats-core` framework with integration/unit separation. Output files saved to `.coderabbit/` directory (gitignored) for Claude Code consumption.
