@@ -40,13 +40,12 @@ git clone https://github.com/focus/gh-coderabbit-comments.git
 cd gh-coderabbit-comments
 
 # Copy to your PATH (required - so you can run from any repo)
-mkdir -p ~/bin
-cp bin/gh-crab-comments ~/bin/
-chmod +x ~/bin/gh-crab-comments
+mkdir -p ~/.local/bin
+cp bin/gh-crab-comments ~/.local/bin/
+chmod +x ~/.local/bin/gh-crab-comments
 
-# Add ~/bin to PATH if not already there
-echo 'export PATH="$HOME/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
+# Verify ~/.local/bin is in PATH
+echo $PATH | grep -q ".local/bin" || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 
 # Verify installation
 which gh-crab-comments
