@@ -309,17 +309,27 @@ filter_and_format_comments() {
   # Process comments with proper handling of multi-line text
   jq -r 'sort_by(.path, .createdAt) | .[] | [.path, .bodyText] | @tsv' "$comments_json" | \
   while IFS=$'\t' read -r path body_text; do
-    # Replace literal \n with actual newlines and indent continuation lines
-    formatted_body=$(echo "$body_text" | sed 's/\\n/\n   /g')
+    # Replace literal \n with actual newlines
+    formatted_body=$(echo "$body_text" | sed 's/\\n/\n/g')
+
+    # Clean up CodeRabbit UI markup - keep only the useful content
+    # Remove sections after "📝 Committable suggestion" marker
+    formatted_body=$(echo "$formatted_body" | sed '/📝 Committable suggestion/,$d')
+
+    # Remove HTML-like tags and excessive whitespace
+    formatted_body=$(echo "$formatted_body" | sed 's/<[^>]*>//g' | sed '/^[[:space:]]*$/d')
+
+    # Indent all lines for readability
+    formatted_body=$(echo "$formatted_body" | sed 's/^/   /')
 
     # Display to terminal
     echo "📝 $path"
-    echo "   $formatted_body"
+    echo "$formatted_body"
     echo ""
 
     # Write to output file
     echo "📝 $path" >> "$output_txt"
-    echo "   $formatted_body" >> "$output_txt"
+    echo "$formatted_body" >> "$output_txt"
     echo "" >> "$output_txt"
   done
 
