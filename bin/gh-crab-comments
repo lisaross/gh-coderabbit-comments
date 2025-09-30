@@ -62,12 +62,86 @@ check_dependencies() {
   fi
 }
 
+# Detect repository context (owner, name, branch)
+detect_repository_context() {
+  # Check if in git repository
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "❌ Must be run inside a git repository"
+    exit 1
+  fi
+
+  # Extract repository owner
+  OWNER=$(gh repo view --json owner -q .owner.login 2>/dev/null) || {
+    echo "❌ Failed to detect repository owner"
+    echo "Make sure you're in a valid git repository with a remote"
+    exit 1
+  }
+
+  # Extract repository name
+  REPO=$(gh repo view --json name -q .name 2>/dev/null) || {
+    echo "❌ Failed to detect repository name"
+    exit 1
+  }
+
+  # Validate owner name (GitHub username pattern)
+  if ! [[ "$OWNER" =~ ^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$ ]]; then
+    echo "❌ Invalid repository owner: $OWNER"
+    exit 1
+  fi
+
+  # Validate repo name
+  if ! [[ "$REPO" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+    echo "❌ Invalid repository name: $REPO"
+    exit 1
+  fi
+
+  # Get current branch
+  local current_branch
+  current_branch=$(git branch --show-current)
+
+  if [ -z "$current_branch" ]; then
+    echo "❌ Could not determine current branch"
+    exit 1
+  fi
+}
+
+# Detect PR number for current branch
+detect_pr_number() {
+  # Check GitHub authentication
+  if ! gh auth status >/dev/null 2>&1; then
+    echo "❌ GitHub authentication required"
+    echo "Run: gh auth login"
+    exit 1
+  fi
+
+  # Get PR number for current branch
+  PR_NUMBER=$(gh pr view --json number -q .number 2>/dev/null)
+
+  if [ -z "$PR_NUMBER" ]; then
+    echo "❌ No PR found for current branch"
+    exit 1
+  fi
+
+  # Validate PR number is a positive integer
+  if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]] || [ "$PR_NUMBER" -le 0 ]; then
+    echo "❌ Invalid PR number: $PR_NUMBER"
+    exit 1
+  fi
+}
+
 # Main function
 main() {
   # Check dependencies first
   check_dependencies
 
-  echo "✅ All dependencies checked"
+  # Detect repository context
+  detect_repository_context
+
+  # Detect PR number
+  detect_pr_number
+
+  echo "✅ Repository: $OWNER/$REPO"
+  echo "✅ PR Number: $PR_NUMBER"
 }
 
 # Run main function
