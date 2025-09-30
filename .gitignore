@@ -1,0 +1,13 @@
+# CodeRabbit output files
+.coderabbit/
+
+# Temporary files
+*.tmp
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+
+# Test artifacts
+tests/fixtures/
