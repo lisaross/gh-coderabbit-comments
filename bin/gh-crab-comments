@@ -2,7 +2,11 @@
 
 # gh-crab-comments: Fetch unresolved CodeRabbit comments from GitHub PRs
 # Usage: Run from within a git repository with an associated PR
-# Exit codes: 0 (success), 1 (user error), 2 (system error)
+#
+# Exit codes (per FR-014):
+#   0 - Success (comments found or no comments)
+#   1 - User error (no PR, not in repo, auth failure, invalid input)
+#   2 - System error (rate limit, network failure, missing dependencies)
 
 set -e          # Exit on error
 set -u          # Exit on undefined variable
@@ -261,6 +265,82 @@ handle_graphql_errors() {
   exit 2
 }
 
+# Filter and format comments
+filter_and_format_comments() {
+  local formatted_output=""
+  local comment_count=0
+  local display_output=""
+
+  # Process all responses from temp file
+  while IFS= read -r response; do
+    # Skip empty lines
+    [ -z "$response" ] && continue
+
+    # Extract unresolved threads with CodeRabbit comments
+    local filtered_comments
+    filtered_comments=$(echo "$response" | jq -r '
+      .data.repository.pullRequest.reviewThreads.nodes[]?
+      | select(.isResolved == false)
+      | .comments.nodes[]
+      | select(.author.login == "coderabbitai")
+      | {path: .path, bodyText: .bodyText, createdAt: .createdAt}
+      | "\(.path)|\(.bodyText)|\(.createdAt)"
+    ' 2>/dev/null || true)
+
+    if [ -n "$filtered_comments" ]; then
+      formatted_output+="$filtered_comments"$'\n'
+    fi
+  done < "$TEMP_FILE"
+
+  # Count comments
+  if [ -n "$formatted_output" ]; then
+    comment_count=$(echo "$formatted_output" | grep -c "^" || echo 0)
+  fi
+
+  # Display results
+  if [ "$comment_count" -eq 0 ]; then
+    echo ""
+    echo "✅ No unresolved CodeRabbit comments found"
+    return 0
+  fi
+
+  # Group by file path and format output
+  echo ""
+  echo "Found $comment_count unresolved CodeRabbit comments:"
+  echo ""
+
+  display_output="Found $comment_count unresolved CodeRabbit comments:"$'\n\n'
+
+  # Sort by path, then by timestamp
+  echo "$formatted_output" | sort | while IFS='|' read -r path body_text created_at; do
+    [ -z "$path" ] && continue
+
+    local formatted_line="📝 $path"$'\n'"   $body_text"$'\n'
+    echo "$formatted_line"
+    display_output+="$formatted_line"
+  done
+
+  # Save to file
+  save_to_file "$display_output"
+}
+
+# Save output to file
+save_to_file() {
+  local content="$1"
+
+  # Create .coderabbit directory if not exists
+  mkdir -p .coderabbit
+
+  # Set output file path
+  OUTPUT_FILE=".coderabbit/pr-${PR_NUMBER}-comments.txt"
+
+  # Write content to file
+  echo "$content" > "$OUTPUT_FILE"
+
+  echo ""
+  echo "💾 Saved to: $OUTPUT_FILE"
+}
+
 # Main function
 main() {
   # Check dependencies first
@@ -275,8 +355,8 @@ main() {
   # Fetch review threads
   fetch_review_threads
 
-  echo ""
-  echo "✅ Fetching complete"
+  # Filter and format comments
+  filter_and_format_comments
 }
 
 # Run main function
