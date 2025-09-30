@@ -35,6 +35,17 @@
 
 ---
 
+## Clarifications
+
+### Session 2025-09-30
+- Q: When the PR has many unresolved comments, how should output be handled? → A: Display all comments and save to file for review
+- Q: How should nested conversation threads be handled (when CodeRabbit replies are mixed with user replies)? → A: Show all CodeRabbit comments in thread chronologically
+- Q: When GitHub authentication fails, what should happen? → A: Prompt user to run gh auth login
+- Q: When GitHub API rate limiting occurs, what should happen? → A: Exit with error and show rate limit reset time
+- Q: Should the tool work with closed or merged PRs? → A: Yes, fetch comments from any PR state
+
+---
+
 ## User Scenarios & Testing
 
 ### Primary User Story
@@ -55,11 +66,11 @@ A developer working on a pull request receives CodeRabbit review comments and wa
 
 ### Edge Cases
 
-- What happens when the PR has hundreds of unresolved comments? [NEEDS CLARIFICATION: Should there be pagination or output limits?]
-- How does the system handle CodeRabbit comments in nested conversation threads?
-- What happens if GitHub authentication fails or expires?
-- How does the system handle rate limiting from GitHub API?
-- What happens when a PR has been closed or merged?
+- When the PR has many unresolved comments, the system displays all to terminal AND saves a copy to a file for review
+- In nested conversation threads (CodeRabbit + user replies), all CodeRabbit comments are shown in chronological order
+- If GitHub authentication fails or expires, the system prompts the user to run `gh auth login` and exits
+- When GitHub API rate limiting occurs, the system exits with an error message showing when the rate limit will reset
+- The tool works with PRs in any state (open, closed, merged) - fetching comments regardless of PR status
 
 ## Requirements
 
@@ -67,17 +78,21 @@ A developer working on a pull request receives CodeRabbit review comments and wa
 
 - **FR-001**: System MUST auto-detect the current git repository's owner and name from the working directory
 - **FR-002**: System MUST auto-detect the PR number associated with the current branch
-- **FR-003**: System MUST fetch all review threads from the detected PR
+- **FR-003**: System MUST fetch all review threads from the detected PR regardless of PR state (open, closed, or merged)
 - **FR-004**: System MUST filter review threads to only include unresolved threads
 - **FR-005**: System MUST filter comments within unresolved threads to only show comments authored by CodeRabbit (login: "coderabbitai")
+- **FR-005a**: System MUST display all CodeRabbit comments from a thread in chronological order (by creation timestamp)
 - **FR-006**: System MUST display each comment with its associated file path
 - **FR-007**: System MUST display each comment's text content in readable format
 - **FR-008**: System MUST handle pagination when fetching review threads (PRs may have more than 100 threads)
 - **FR-009**: System MUST display a friendly message when no unresolved CodeRabbit comments are found
-- **FR-010**: System MUST display clear error messages when prerequisites are not met (no PR, not in repo, authentication failure)
+- **FR-010**: System MUST display clear error messages when prerequisites are not met (no PR, not in repo)
+- **FR-010a**: System MUST prompt user to run `gh auth login` when authentication fails and exit with code 1
+- **FR-010b**: System MUST detect GitHub API rate limiting and exit with error message showing rate limit reset time (exit code 2)
 - **FR-011**: System MUST use existing GitHub CLI authentication (no separate credential management)
 - **FR-012**: System MUST support standard terminal output with visual formatting (emojis, spacing)
-- **FR-013**: System MUST exit with code 0 on success, 1 on user error, 2 on system error
+- **FR-013**: System MUST save all fetched comments to a file for later review
+- **FR-014**: System MUST exit with code 0 on success, 1 on user error, 2 on system error
 
 ### Key Entities
 
@@ -97,7 +112,7 @@ A developer working on a pull request receives CodeRabbit review comments and wa
 - [x] All mandatory sections completed
 
 ### Requirement Completeness
-- [ ] No [NEEDS CLARIFICATION] markers remain (1 marker for pagination/limits)
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Scope is clearly bounded
@@ -113,6 +128,6 @@ A developer working on a pull request receives CodeRabbit review comments and wa
 - [x] User scenarios defined
 - [x] Requirements generated
 - [x] Entities identified
-- [ ] Review checklist passed (pending clarification)
+- [x] Review checklist passed
 
 ---
