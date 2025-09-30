@@ -14,6 +14,35 @@ OWNER=""
 REPO=""
 PR_NUMBER=""
 OUTPUT_FILE=""
+MAX_PAGES=100
+
+# GraphQL query for fetching review threads
+GRAPHQL_QUERY='query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $number) {
+      reviewThreads(first: 100, after: $cursor) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        nodes {
+          isResolved
+          comments(first: 100) {
+            nodes {
+              id
+              author {
+                login
+              }
+              bodyText
+              createdAt
+              path
+            }
+          }
+        }
+      }
+    }
+  }
+}'
 
 # Cleanup function - removes temporary files
 cleanup() {
@@ -129,6 +158,109 @@ detect_pr_number() {
   fi
 }
 
+# Fetch review threads with pagination
+fetch_review_threads() {
+  local cursor="null"
+  local page_count=0
+  local all_threads=""
+
+  # Create temp file for responses
+  TEMP_FILE=$(mktemp)
+
+  echo "🔍 Fetching unresolved CodeRabbit comments from PR #$PR_NUMBER..."
+
+  while [ "$page_count" -lt "$MAX_PAGES" ]; do
+    local response
+
+    # Make GraphQL request
+    if [ "$cursor" = "null" ]; then
+      # First request without cursor
+      response=$(gh api graphql \
+        -f query="$GRAPHQL_QUERY" \
+        -f owner="$OWNER" \
+        -f repo="$REPO" \
+        -F number="$PR_NUMBER" 2>&1) || {
+        handle_api_error "$response"
+      }
+    else
+      # Subsequent requests with cursor
+      response=$(gh api graphql \
+        -f query="$GRAPHQL_QUERY" \
+        -f owner="$OWNER" \
+        -f repo="$REPO" \
+        -F number="$PR_NUMBER" \
+        -f cursor="$cursor" 2>&1) || {
+        handle_api_error "$response"
+      }
+    fi
+
+    # Check for errors in response
+    if echo "$response" | jq -e '.errors' >/dev/null 2>&1; then
+      handle_graphql_errors "$response"
+    fi
+
+    # Append threads to all_threads
+    echo "$response" >> "$TEMP_FILE"
+
+    # Check if more pages exist
+    local has_next
+    has_next=$(echo "$response" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.hasNextPage // "false"')
+
+    if [ "$has_next" != "true" ]; then
+      break
+    fi
+
+    # Get next cursor
+    cursor=$(echo "$response" | jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.endCursor // "null"')
+
+    if [ "$cursor" = "null" ]; then
+      break
+    fi
+
+    page_count=$((page_count + 1))
+  done
+
+  # Warn if we hit max pages
+  if [ "$page_count" -ge "$MAX_PAGES" ]; then
+    echo "⚠️  Warning: Reached maximum page limit ($MAX_PAGES pages)" >&2
+  fi
+}
+
+# Handle API errors
+handle_api_error() {
+  local error_msg="$1"
+
+  echo "❌ GitHub API error: $error_msg" >&2
+  exit 2
+}
+
+# Handle GraphQL errors in response
+handle_graphql_errors() {
+  local response="$1"
+
+  # Check for rate limiting
+  if echo "$response" | jq -e '.errors[]? | select(.type=="RATE_LIMITED")' >/dev/null 2>&1; then
+    local reset_time
+    reset_time=$(echo "$response" | jq -r '.errors[0].extensions.resetAt // "unknown"')
+    echo "❌ GitHub API rate limit exceeded" >&2
+    echo "Rate limit resets at: $reset_time" >&2
+    exit 2
+  fi
+
+  # Check for not found
+  if echo "$response" | jq -e '.errors[]? | select(.type=="NOT_FOUND")' >/dev/null 2>&1; then
+    echo "❌ Repository or PR not found" >&2
+    echo "Verify that $OWNER/$REPO PR #$PR_NUMBER exists" >&2
+    exit 1
+  fi
+
+  # Generic error
+  local error_message
+  error_message=$(echo "$response" | jq -r '.errors[0].message // "Unknown error"')
+  echo "❌ GraphQL error: $error_message" >&2
+  exit 2
+}
+
 # Main function
 main() {
   # Check dependencies first
@@ -140,8 +272,11 @@ main() {
   # Detect PR number
   detect_pr_number
 
-  echo "✅ Repository: $OWNER/$REPO"
-  echo "✅ PR Number: $PR_NUMBER"
+  # Fetch review threads
+  fetch_review_threads
+
+  echo ""
+  echo "✅ Fetching complete"
 }
 
 # Run main function
