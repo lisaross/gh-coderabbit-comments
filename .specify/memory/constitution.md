@@ -2,7 +2,7 @@
 Sync Impact Report
 ==================
 Version: NONE → 1.0.0 (Initial constitution creation)
-Rationale: MINOR bump - establishing foundational governance for new CLI tool project
+Rationale: MAJOR bump - establishing foundational governance for new CLI tool project
 
 Principles Added:
 - I. Shell-First Development (bash script foundation)
@@ -11,13 +11,19 @@ Principles Added:
 - IV. GitHub CLI Extension Pattern (gh integration)
 - V. User-Friendly Output (formatted, readable results)
 
+Modified Sections:
+- Development Workflow (Testing Requirements, Documentation Standards, Commit Discipline)
+- Security & Reliability (Authentication, Input Validation, Error Handling)
+- Governance (Amendment Process, Version Policy, Compliance Review)
+
 Templates Status:
-✅ plan-template.md - Constitution Check section ready for shell/CLI principles
+✅ plan-template.md - Constitution reference updated to v1.0.0 + correct path
 ✅ spec-template.md - No changes needed (generic feature spec)
 ✅ tasks-template.md - No changes needed (generic task structure)
+✅ agent-file-template.md - Already generic (no agent-specific hardcoding)
 
 Deferred Items:
-- RATIFICATION_DATE marked as TODO (awaiting user confirmation of project start date)
+- None
 
 Last Updated: 2025-09-30
 -->
@@ -164,4 +170,4 @@ All PRs MUST verify:
 - [ ] macOS-specific paths/commands not hardcoded (use `$HOME`, `command -v`)
 - [ ] Token efficiency maintained (no verbose logging by default)
 
-**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE: awaiting user confirmation) | **Last Amended**: 2025-09-30
+**Version**: 1.0.0 | **Ratified**: 2025-09-30 | **Last Amended**: 2025-09-30
