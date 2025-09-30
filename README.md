@@ -53,7 +53,7 @@ which gh-crab-comments
 
 ## Usage
 
-### Basic Usage
+### For Users: Interactive Command Line
 
 From any git repository with an open PR:
 
@@ -72,25 +72,93 @@ The script will:
 4. Display them grouped by file path
 5. Save the output to `.coderabbit/pr-{number}-comments.txt`
 
+### For AI Agents: Automated Integration
+
+AI coding assistants (like Claude Code, Cursor, Aider, etc.) can use this tool to fetch CodeRabbit feedback:
+
+```bash
+# Agent workflow: Fetch and process CodeRabbit comments
+cd /path/to/project
+gh-crab-comments
+
+# Read the saved output file
+cat .coderabbit/pr-$(gh pr view --json number -q .number)-comments.txt
+
+# Parse and implement fixes
+# (Agent processes comments and makes code changes)
+```
+
+**Benefits for AI Agents:**
+- 🤖 **Clean, parseable output** - No HTML/UI markup, just pure comment content
+- 📁 **Persistent file storage** - Comments saved for token-efficient re-reading
+- 🎯 **Grouped by file** - Easy to batch-process fixes by file
+- ⚡ **Fast retrieval** - No need to scrape GitHub UI or parse complex API responses
+- 🔄 **Works in CI/CD** - Can be automated in GitHub Actions or other pipelines
+
+**Example Agent Integration:**
+
+```python
+# Python example for AI agent
+import subprocess
+import os
+
+def get_coderabbit_comments(repo_path):
+    """Fetch CodeRabbit comments for current PR."""
+    os.chdir(repo_path)
+
+    # Run gh-crab-comments
+    result = subprocess.run(['gh-crab-comments'],
+                          capture_output=True,
+                          text=True)
+
+    if result.returncode == 0:
+        # Get PR number and read file
+        pr_num = subprocess.check_output(
+            ['gh', 'pr', 'view', '--json', 'number', '-q', '.number'],
+            text=True
+        ).strip()
+
+        with open(f'.coderabbit/pr-{pr_num}-comments.txt', 'r') as f:
+            return f.read()
+
+    return None
+
+# Agent can now process comments and make fixes
+comments = get_coderabbit_comments('/path/to/repo')
+# ... implement fixes based on comments ...
+```
+
 ### Example Output
 
 ```
 🔍 Fetching unresolved CodeRabbit comments from PR #123...
 
-Found 3 unresolved CodeRabbit comments:
+Found 6 unresolved CodeRabbit comments:
+
+📝 .gitignore
+   ⚠️ Potential issue | 🟠 Major
+   Don't ignore the entire .claude/ directory
+   Blanket-ignoring .claude/ will prevent committing required Claude Code configs...
+   Apply this diff to keep project configs tracked while excluding local files:
+   -# Claude Code hooks and settings (local only)
+   -.claude/
+   +# Claude Code (commit project configs; ignore only local/secrets)
+   +.claude/settings.local.json
+   +.claude/**/secrets/**
 
 📝 src/utils/parser.js
-   Consider using early return to reduce nesting depth.
-   This will improve readability and maintainability.
-
-📝 src/utils/parser.js
+   ⚠️ Potential issue | 🔴 Critical
    Add error handling for null input cases.
-
-📝 tests/parser.test.js
-   Add test case for edge condition when input is empty array.
+   The function will crash if input is null or undefined...
 
 💾 Saved to: .coderabbit/pr-123-comments.txt
 ```
+
+**Output Format:**
+- Comments are grouped by file path (📝 emoji prefix)
+- Severity indicators included (⚠️ with 🔴 Critical / 🟠 Major / 🟡 Minor)
+- Code suggestions formatted with proper indentation
+- Clean, readable text without HTML markup
 
 ### No Comments Found
 
