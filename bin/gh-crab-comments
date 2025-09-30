@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+# gh-crab-comments: Fetch unresolved CodeRabbit comments from GitHub PRs
+# Usage: Run from within a git repository with an associated PR
+# Exit codes: 0 (success), 1 (user error), 2 (system error)
+
+set -e          # Exit on error
+set -u          # Exit on undefined variable
+set -o pipefail # Exit on pipe failure
+
+# Global variables
+TEMP_FILE=""
+OWNER=""
+REPO=""
+PR_NUMBER=""
+OUTPUT_FILE=""
+
+# Cleanup function - removes temporary files
+cleanup() {
+  if [ -n "$TEMP_FILE" ] && [ -f "$TEMP_FILE" ]; then
+    rm -f "$TEMP_FILE"
+  fi
+}
+
+# Register cleanup on exit, interrupt, and terminate signals
+trap cleanup EXIT INT TERM
+
+# Check required dependencies
+check_dependencies() {
+  local missing_deps=()
+
+  if ! command -v gh >/dev/null 2>&1; then
+    missing_deps+=("gh CLI")
+  fi
+
+  if ! command -v jq >/dev/null 2>&1; then
+    missing_deps+=("jq")
+  fi
+
+  if ! command -v git >/dev/null 2>&1; then
+    missing_deps+=("git")
+  fi
+
+  if [ ${#missing_deps[@]} -gt 0 ]; then
+    echo "❌ Missing required dependencies: ${missing_deps[*]}"
+    echo ""
+    echo "Please install:"
+    for dep in "${missing_deps[@]}"; do
+      case $dep in
+        "gh CLI")
+          echo "  - gh CLI: brew install gh"
+          ;;
+        "jq")
+          echo "  - jq: brew install jq"
+          ;;
+        "git")
+          echo "  - git: should be pre-installed on macOS"
+          ;;
+      esac
+    done
+    exit 2
+  fi
+}
+
+# Main function
+main() {
+  # Check dependencies first
+  check_dependencies
+
+  echo "✅ All dependencies checked"
+}
+
+# Run main function
+main "$@"

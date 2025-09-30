@@ -78,7 +78,7 @@
 
 ### Contract Test
 
-- [ ] **T004** [P] Contract test: Verify GraphQL query structure in `tests/integration/test_graphql_contract.bats`
+- [x] **T004** [P] Contract test: Verify GraphQL query structure in `tests/integration/test_graphql_contract.bats`
   - Write bats test that calls `gh api graphql` with FetchReviewThreads query
   - Use test repository (anthropics/test-repo or similar)
   - Assert response contains `.data.repository.pullRequest.reviewThreads`
@@ -89,7 +89,7 @@
 
 ### Integration Tests (from quickstart.md scenarios)
 
-- [ ] **T005** [P] Integration test: Happy path with comments found in `tests/integration/test_happy_path.bats`
+- [x] **T005** [P] Integration test: Happy path with comments found in `tests/integration/test_happy_path.bats`
   - Scenario 1 from quickstart.md
   - Setup: Mock or use test repo with PR containing unresolved CodeRabbit comments
   - Run `bin/gh-crab-comments` (will fail initially)
@@ -99,28 +99,28 @@
   - Assert file created in `.coderabbit/pr-{number}-comments.txt`
   - Assert exit code 0
 
-- [ ] **T006** [P] Integration test: No unresolved comments in `tests/integration/test_no_comments.bats`
+- [x] **T006** [P] Integration test: No unresolved comments in `tests/integration/test_no_comments.bats`
   - Scenario 2 from quickstart.md
   - Setup: Use PR with all comments resolved
   - Run `bin/gh-crab-comments`
   - Assert output contains "✅ No unresolved CodeRabbit comments found"
   - Assert exit code 0
 
-- [ ] **T007** [P] Integration test: No PR found for branch in `tests/integration/test_no_pr.bats`
+- [x] **T007** [P] Integration test: No PR found for branch in `tests/integration/test_no_pr.bats`
   - Scenario 3 from quickstart.md
   - Setup: Checkout branch without associated PR
   - Run `bin/gh-crab-comments`
   - Assert output contains "❌ No PR found for current branch"
   - Assert exit code 1
 
-- [ ] **T008** [P] Integration test: Not in git repository in `tests/integration/test_not_in_repo.bats`
+- [x] **T008** [P] Integration test: Not in git repository in `tests/integration/test_not_in_repo.bats`
   - Scenario 4 from quickstart.md
   - Setup: Run from non-git directory (e.g., /tmp)
   - Run `bin/gh-crab-comments`
   - Assert output contains "❌ Must be run inside a git repository"
   - Assert exit code 1
 
-- [ ] **T009** [P] Integration test: Authentication failure in `tests/integration/test_auth_failure.bats`
+- [x] **T009** [P] Integration test: Authentication failure in `tests/integration/test_auth_failure.bats`
   - Scenario 5 from quickstart.md
   - Setup: Mock `gh auth status` to fail
   - Run `bin/gh-crab-comments`
@@ -128,7 +128,7 @@
   - Assert output contains "Run: gh auth login"
   - Assert exit code 1
 
-- [ ] **T010** [P] Integration test: Large PR with pagination in `tests/integration/test_pagination.bats`
+- [x] **T010** [P] Integration test: Large PR with pagination in `tests/integration/test_pagination.bats`
   - Scenario 6 from quickstart.md
   - Setup: Use PR with >100 review threads (or mock response)
   - Run `bin/gh-crab-comments`
@@ -137,7 +137,7 @@
   - Assert exit code 0
   - Assert performance: completes in <30 seconds
 
-- [ ] **T011** [P] Integration test: Mixed authors in threads in `tests/integration/test_mixed_authors.bats`
+- [x] **T011** [P] Integration test: Mixed authors in threads in `tests/integration/test_mixed_authors.bats`
   - Scenario 7 from quickstart.md
   - Setup: PR with threads containing both CodeRabbit and human comments
   - Run `bin/gh-crab-comments`
@@ -146,7 +146,7 @@
   - Assert chronological order within threads (oldest first)
   - Assert exit code 0
 
-- [ ] **T012** [P] Integration test: Closed/merged PR in `tests/integration/test_closed_pr.bats`
+- [x] **T012** [P] Integration test: Closed/merged PR in `tests/integration/test_closed_pr.bats`
   - Scenario 8 from quickstart.md
   - Setup: Use closed or merged PR with unresolved comments
   - Run `bin/gh-crab-comments`
@@ -154,7 +154,7 @@
   - Assert no state-related errors
   - Assert exit code 0
 
-- [ ] **T013** [P] Integration test: Output file validation in `tests/integration/test_output_file.bats`
+- [x] **T013** [P] Integration test: Output file validation in `tests/integration/test_output_file.bats`
   - Scenario 9 from quickstart.md
   - Run `bin/gh-crab-comments`
   - Assert file created: `.coderabbit/pr-{number}-comments.txt`
@@ -162,7 +162,7 @@
   - Assert file readable (plain text, UTF-8)
   - Assert file persists after script exits
 
-- [ ] **T014** [P] Integration test: Signal interruption (Ctrl+C) in `tests/integration/test_signal_handling.bats`
+- [x] **T014** [P] Integration test: Signal interruption (Ctrl+C) in `tests/integration/test_signal_handling.bats`
   - Scenario 10 from quickstart.md
   - Run `bin/gh-crab-comments` in background
   - Send SIGINT (Ctrl+C simulation)
@@ -171,7 +171,7 @@
   - Assert no partial output files
   - Assert cleanup function executed
 
-- [ ] **T015** [P] Integration test: Rate limiting in `tests/integration/test_rate_limit.bats`
+- [x] **T015** [P] Integration test: Rate limiting in `tests/integration/test_rate_limit.bats`
   - Scenario 11 from quickstart.md
   - Setup: Mock rate limit response from GraphQL API
   - Run `bin/gh-crab-comments`
