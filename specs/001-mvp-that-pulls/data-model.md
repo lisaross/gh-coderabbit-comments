@@ -118,7 +118,7 @@
 
 ## Data Flow
 
-```
+```text
 1. Repository Context Detection
    ↓
    [Git working directory] → {owner, name, currentBranch}

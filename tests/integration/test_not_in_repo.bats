@@ -9,7 +9,9 @@
   # Change to non-git directory
   cd /tmp
 
-  run /Users/focus/Developer/Projects/gh-coderabbit-comments/bin/gh-crab-comments
+  # Store original directory to reference bin/gh-crab-comments
+  SCRIPT_DIR="$BATS_TEST_DIRNAME/../.."
+  run "$SCRIPT_DIR/bin/gh-crab-comments"
 
   # Should fail with exit code 1 (user error)
   [ "$status" -eq 1 ]
@@ -22,6 +24,7 @@
   skip "Requires implementation of bin/gh-crab-comments"
 
   cd /tmp
-  run /Users/focus/Developer/Projects/gh-coderabbit-comments/bin/gh-crab-comments
+  SCRIPT_DIR="$BATS_TEST_DIRNAME/../.."
+  run "$SCRIPT_DIR/bin/gh-crab-comments"
   [ "$status" -eq 1 ]
 }

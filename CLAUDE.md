@@ -7,8 +7,9 @@ Auto-generated from all feature plans. Last updated: 2025-09-30
 
 ## Project Structure
 ```
-src/
+bin/
 tests/
+specs/
 ```
 
 ## Commands

@@ -52,8 +52,8 @@ query FetchReviewThreads(
 
 | Parameter | Type | Required | Description | Validation |
 |-----------|------|----------|-------------|------------|
-| `owner` | String | Yes | Repository owner (user/org login) | Match `^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$` |
-| `repo` | String | Yes | Repository name | Match `^[a-zA-Z0-9._-]+$` |
+| `owner` | String | Yes | Repository owner (user/org login) | Match `^(?=.{1,39}$)(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$` (1-39 chars, no leading/trailing hyphens, no consecutive hyphens) |
+| `repo` | String | Yes | Repository name | Match `^(?=.{1,100}$)(?!\\.{1,2}$)(?!.*\\.git$)[A-Za-z0-9._-]+$` (1-100 chars, not "." or "..", cannot end with ".git") |
 | `number` | Int | Yes | Pull request number | Positive integer > 0 |
 | `cursor` | String | No | Pagination cursor from previous response | Base64-encoded string or null |
 

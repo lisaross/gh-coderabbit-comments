@@ -179,23 +179,23 @@ fetch_review_threads() {
     # Make GraphQL request
     if [ "$cursor" = "null" ]; then
       # First request without cursor
-      response=$(gh api graphql \
+      if ! response=$(gh api graphql \
         -f query="$GRAPHQL_QUERY" \
         -f owner="$OWNER" \
         -f repo="$REPO" \
-        -F number="$PR_NUMBER" 2>&1) || {
-        handle_api_error "$response"
-      }
+        -F number="$PR_NUMBER" 2>&1); then
+        handle_api_error "Failed to execute GraphQL query (exit code: $?)"
+      fi
     else
       # Subsequent requests with cursor
-      response=$(gh api graphql \
+      if ! response=$(gh api graphql \
         -f query="$GRAPHQL_QUERY" \
         -f owner="$OWNER" \
         -f repo="$REPO" \
         -F number="$PR_NUMBER" \
-        -f cursor="$cursor" 2>&1) || {
-        handle_api_error "$response"
-      }
+        -f cursor="$cursor" 2>&1); then
+        handle_api_error "Failed to execute GraphQL query (exit code: $?)"
+      fi
     fi
 
     # Check for errors in response
