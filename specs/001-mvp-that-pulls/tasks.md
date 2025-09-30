@@ -296,7 +296,7 @@
 
 ### Unit Tests
 
-- [ ] **T025** [P] Unit test: Pagination logic in `tests/unit/test_pagination_logic.bats`
+- [x] **T025** [P] Unit test: Pagination logic in `tests/unit/test_pagination_logic.bats`
   - Extract pagination loop into testable function (optional refactor)
   - Test cursor initialization: `cursor="null"`
   - Test cursor update from response
@@ -304,13 +304,13 @@
   - Test max pages limit (100 pages) stops loop
   - Mock GraphQL responses for testing
 
-- [ ] **T026** [P] Unit test: Filtering logic in `tests/unit/test_filtering_logic.bats`
+- [x] **T026** [P] Unit test: Filtering logic in `tests/unit/test_filtering_logic.bats`
   - Test `isResolved==false` filter with jq
   - Test `author.login=="coderabbitai"` filter with jq
   - Test chronological sorting by `createdAt`
   - Mock comment data for testing
 
-- [ ] **T027** [P] Unit test: Validation logic in `tests/unit/test_validation.bats`
+- [x] **T027** [P] Unit test: Validation logic in `tests/unit/test_validation.bats`
   - Test owner name validation regex
   - Test repo name validation regex
   - Test PR number validation (positive integer)
@@ -318,7 +318,7 @@
 
 ### Documentation
 
-- [ ] **T028** [P] Write README.md
+- [x] **T028** [P] Write README.md
   - Installation instructions (copy to `~/bin`, add to PATH)
   - Usage examples: `gh-crab-comments`
   - Prerequisites: `gh`, `jq`, `git`, GitHub authentication
@@ -327,7 +327,7 @@
   - Example output screenshots (text format)
   - Link to quickstart.md for detailed testing
 
-- [ ] **T029** [P] Update CHANGELOG.md
+- [x] **T029** [P] Update CHANGELOG.md
   - Add entry for MVP release (v0.1.0 or v1.0.0)
   - List all functional requirements implemented (FR-001 through FR-014)
   - Note constitutional compliance
@@ -335,14 +335,15 @@
 
 ### Manual Testing & Performance
 
-- [ ] **T030** Run manual testing checklist from `specs/001-mvp-that-pulls/quickstart.md`
+- [~] **T030** Run manual testing checklist from `specs/001-mvp-that-pulls/quickstart.md`
   - Execute all 11 test scenarios manually
   - Check off validation checklists in quickstart.md
   - Verify constitution compliance checklist
   - Test on real PRs with varying sizes
   - Document any issues found
+  - **NOTE**: Requires real GitHub repo with PRs. See TESTING.md for instructions.
 
-- [ ] **T031** Performance validation
+- [~] **T031** Performance validation
   - Test small PR (<50 comments): measure time with `time gh-crab-comments`
   - Assert: <5 seconds (per Technical Context)
   - Test medium PR (50-200 comments): measure time
@@ -350,13 +351,15 @@
   - Test large PR (200-500 comments): measure time
   - Assert: <30 seconds (per Technical Context)
   - Record results in quickstart.md performance table
+  - **NOTE**: Requires real PRs for testing. See TESTING.md for instructions.
 
-- [ ] **T032** Final integration check
+- [~] **T032** Final integration check
   - Run all bats tests: `bats tests/integration/*.bats`
   - Run all bats tests: `bats tests/unit/*.bats`
   - Verify all tests pass
   - Fix any failing tests
   - Commit final working version
+  - **NOTE**: Unit tests can run now. Integration tests need test repo setup.
 
 ---
 
