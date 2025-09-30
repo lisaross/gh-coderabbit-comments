@@ -187,7 +187,7 @@
 
 ### Script Skeleton
 
-- [ ] **T016** Create main script skeleton in `bin/gh-crab-comments`
+- [x] **T016** Create main script skeleton in `bin/gh-crab-comments`
   - Add shebang: `#!/usr/bin/env bash`
   - Add error handling: `set -e`, `set -u`, `set -o pipefail`
   - Add cleanup trap: `trap cleanup EXIT INT TERM`
@@ -199,7 +199,7 @@
 
 ### Repository Context Detection
 
-- [ ] **T017** Implement repository context detection in `bin/gh-crab-comments`
+- [x] **T017** Implement repository context detection in `bin/gh-crab-comments`
   - **Validates**: Repository Context entity (spec.md:L102, data-model.md)
   - Check if in git repo: `git rev-parse --is-inside-work-tree`
   - Exit code 1 with error message if not in repo (FR-010)
@@ -213,7 +213,7 @@
 
 ### PR Number Detection
 
-- [ ] **T018** Implement PR number detection in `bin/gh-crab-comments`
+- [x] **T018** Implement PR number detection in `bin/gh-crab-comments`
   - Check auth status: `gh auth status` (exit 1 if fails, prompt for `gh auth login`)
   - Get PR number: `gh pr view --json number -q .number`
   - Exit code 1 with "❌ No PR found for current branch" if empty (FR-010)
@@ -223,7 +223,7 @@
 
 ### GraphQL Query Implementation
 
-- [ ] **T019** Implement GraphQL pagination loop in `bin/gh-crab-comments`
+- [x] **T019** Implement GraphQL pagination loop in `bin/gh-crab-comments`
   - Define FetchReviewThreads query from contracts/github-graphql.md
   - Initialize: `cursor="null"`, `page_count=0`, `MAX_PAGES=100`
   - Implement pagination loop:
@@ -241,7 +241,7 @@
 
 ### Filtering Logic
 
-- [ ] **T020** Implement comment filtering in `bin/gh-crab-comments`
+- [x] **T020** Implement comment filtering in `bin/gh-crab-comments`
   - Filter threads: `select(.isResolved==false)` with jq (FR-004)
   - Filter comments: `select(.author.login=="coderabbitai")` with jq (FR-005)
   - Sort comments by `createdAt` ascending within each thread (FR-005a)
@@ -251,7 +251,7 @@
 
 ### Output Formatting
 
-- [ ] **T021** Implement output formatting in `bin/gh-crab-comments`
+- [x] **T021** Implement output formatting in `bin/gh-crab-comments`
   - Group comments by `path` field (FR-006)
   - Format output with emojis: 🔍, 📝, ✅, ❌ (FR-012)
   - Display file path with 📝 emoji
@@ -263,7 +263,7 @@
 
 ### File Saving
 
-- [ ] **T022** Implement file saving in `bin/gh-crab-comments`
+- [x] **T022** Implement file saving in `bin/gh-crab-comments`
   - Create `.coderabbit/` directory if not exists: `mkdir -p .coderabbit`
   - Save output to `.coderabbit/pr-{number}-comments.txt` (FR-013)
   - File format: plain text with same formatting as terminal output
@@ -273,7 +273,7 @@
 
 ### Exit Codes
 
-- [ ] **T023** Implement exit code handling in `bin/gh-crab-comments`
+- [x] **T023** Implement exit code handling in `bin/gh-crab-comments`
   - Success (comments found or no comments): exit 0 (FR-014)
   - User error (no PR, not in repo, auth failure): exit 1 (FR-014)
   - System error (rate limit, network failure, missing deps): exit 2 (FR-014)
@@ -284,7 +284,7 @@
 
 ## Phase 3.4: Integration
 
-- [ ] **T024** Implement signal handling and cleanup in `bin/gh-crab-comments`
+- [x] **T024** Implement signal handling and cleanup in `bin/gh-crab-comments`
   - Ensure `trap cleanup EXIT INT TERM` catches all signals
   - Cleanup function removes temp files: `rm -f "$TEMP_FILE"`
   - Test Ctrl+C during execution (no orphaned files)
